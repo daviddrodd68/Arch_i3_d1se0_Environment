@@ -1,0 +1,32 @@
+import React from 'react';
+import { {{#each imports}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} } from 'react-native';
+import { StyleSheet } from 'react-native';
+{{#if designTokens}}
+import { theme } from '../theme';
+{{/if}}
+
+{{#if props}}
+interface {{componentName}}Props {
+{{#each props}}
+  {{name}}{{#if optional}}?{{/if}}: {{type}};
+{{/each}}
+}
+{{/if}}
+
+export const {{componentName}}: React.FC<{{#if props}}{{componentName}}Props{{else}}{}{{/if}}> = ({{#if props}}{ {{#each props}}{{name}}{{#if defaultValue}} = {{defaultValue}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}} }{{/if}}) => {
+  return (
+{{{jsx}}}
+  );
+};
+
+const styles = StyleSheet.create({
+{{#each styles}}
+  {{@key}}: {
+{{#each this}}
+    {{@key}}: {{#if (eq @key 'shadowColor')}}'{{{this}}}'{{else if (eq @key 'backgroundColor')}}'{{{this}}}'{{else if (eq @key 'borderColor')}}'{{{this}}}'{{else if (eq @key 'color')}}'{{{this}}}'{{else}}{{this}}{{/if}},
+{{/each}}
+  },
+{{/each}}
+});
+
+export default {{componentName}};

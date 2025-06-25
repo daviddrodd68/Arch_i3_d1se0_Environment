@@ -1,0 +1,105 @@
+{
+  "mcpServers": {
+    "framelink-figma": {
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp", "--figma-api-key=${FIGMA_ACCESS_TOKEN}", "--stdio"],
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_ACCESS_TOKEN}"
+      },
+      "description": "Framelink Figma MCP Server for design data access",
+      "priority": 1,
+      "enabled": true
+    },
+    "tim-holden-figma": {
+      "command": "node",
+      "args": ["./node_modules/figma-mcp-server/dist/index.js"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}",
+        "MCP_SERVER_PORT": "${MCP_SERVER_PORT}"
+      },
+      "description": "Tim Holden's Figma MCP Server (backup)",
+      "priority": 2,
+      "enabled": false
+    }
+  },
+  "tools": {
+    "figma-file-access": {
+      "get-file": {
+        "description": "Retrieve Figma file details and components",
+        "parameters": {
+          "fileKey": "string",
+          "includeComponents": "boolean",
+          "includeStyles": "boolean"
+        }
+      },
+      "list-files": {
+        "description": "List files in a Figma project",
+        "parameters": {
+          "projectId": "string",
+          "filter": "string"
+        }
+      }
+    },
+    "design-tokens": {
+      "extract-tokens": {
+        "description": "Extract design tokens from Figma file",
+        "parameters": {
+          "fileKey": "string",
+          "tokenTypes": "array",
+          "format": "string"
+        }
+      },
+      "get-variables": {
+        "description": "Get design variables from Figma",
+        "parameters": {
+          "fileKey": "string",
+          "variableCollections": "array"
+        }
+      }
+    },
+    "assets": {
+      "export-assets": {
+        "description": "Export assets from Figma",
+        "parameters": {
+          "fileKey": "string",
+          "nodeIds": "array",
+          "format": "string",
+          "scale": "number"
+        }
+      }
+    }
+  },
+  "workflows": {
+    "mobile-code-generation": {
+      "steps": [
+        "extract-design-data",
+        "process-components",
+        "generate-code",
+        "format-output",
+        "save-files"
+      ],
+      "platforms": ["react-native", "flutter", "swiftui", "compose"]
+    },
+    "design-token-sync": {
+      "steps": [
+        "fetch-variables",
+        "extract-tokens",
+        "transform-tokens",
+        "generate-platform-files",
+        "update-codebase"
+      ],
+      "formats": ["json", "yaml", "css", "scss", "js", "ts"]
+    }
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 300,
+    "maxSize": 1000,
+    "strategy": "lru"
+  },
+  "rateLimit": {
+    "enabled": true,
+    "requestsPerMinute": 60,
+    "burstLimit": 10
+  }
+}

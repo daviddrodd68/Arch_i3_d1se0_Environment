@@ -1,0 +1,78 @@
+// Design System Theme
+// Generated from Figma design tokens
+
+export const theme = {
+  colors: {
+{{#each colors}}
+    {{@key}}: '{{this}}',
+{{/each}}
+  },
+
+  typography: {
+{{#each typography}}
+    {{@key}}: {
+{{#each this}}
+      {{@key}}: {{#if (eq @key 'fontFamily')}}'{{{this}}}'{{else if (eq @key 'fontSize')}}'{{{this}}}'{{else if (eq @key 'fontWeight')}}'{{{this}}}'{{else if (eq @key 'lineHeight')}}'{{{this}}}'{{else if (eq @key 'letterSpacing')}}'{{{this}}}'{{else if (eq @key 'textAlign')}}'{{{this}}}'{{else}}{{this}}{{/if}},
+{{/each}}
+    },
+{{/each}}
+  },
+
+  spacing: {
+{{#each spacing}}
+    {{@key}}: {{#if (eq this 'string')}}'{{{this}}}'{{else}}{{this}}{{/if}},
+{{/each}}
+  },
+
+  shadows: {
+{{#each shadows}}
+    {{@key}}: {
+{{#if this.css}}
+      // CSS: {{this.css}}
+{{/if}}
+{{#each this}}
+{{#unless (eq @key 'css')}}
+      {{@key}}: {{#if (eq @key 'color')}}'{{{this}}}'{{else if (eq @key 'offsetX')}}'{{{this}}}'{{else if (eq @key 'offsetY')}}'{{{this}}}'{{else if (eq @key 'blurRadius')}}'{{{this}}}'{{else if (eq @key 'spreadRadius')}}'{{{this}}}'{{else}}{{this}}{{/if}},
+{{/unless}}
+{{/each}}
+    },
+{{/each}}
+  },
+
+  radii: {
+{{#each radii}}
+    {{@key}}: {{#if (eq this 'string')}}'{{{this}}}'{{else}}{{this}}{{/if}},
+{{/each}}
+  },
+
+  // Utility functions
+  getColor: (colorKey: string) => {
+    return theme.colors[colorKey] || colorKey;
+  },
+
+  getSpacing: (spacingKey: string) => {
+    return theme.spacing[spacingKey] || spacingKey;
+  },
+
+  getTypography: (typographyKey: string) => {
+    return theme.typography[typographyKey] || {};
+  },
+
+  getShadow: (shadowKey: string) => {
+    const shadow = theme.shadows[shadowKey];
+    if (!shadow) return {};
+
+    return {
+      shadowColor: shadow.color || '#000',
+      shadowOffset: {
+        width: parseFloat(shadow.offsetX) || 0,
+        height: parseFloat(shadow.offsetY) || 0,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: parseFloat(shadow.blurRadius) || 0,
+      elevation: 5, // Android
+    };
+  },
+};
+
+export default theme;
