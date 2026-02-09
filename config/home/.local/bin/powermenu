@@ -1,0 +1,16 @@
+#!/bin/bash
+
+options=" Apagar\n Reiniciar\n Bloquear\n󰍃 Cerrar sesión"
+
+chosen=$(echo -e "$options" | rofi \
+    -dmenu \
+    -i \
+    -p "Sistema" \
+    -theme ~/.config/rofi/themes/powermenu.rasi)
+
+case "$chosen" in
+    " Apagar") poweroff ;;
+    " Reiniciar") reboot ;;
+    " Bloquear") i3lock ;;
+    "󰍃 Cerrar sesión") i3-msg exit ;;
+esac

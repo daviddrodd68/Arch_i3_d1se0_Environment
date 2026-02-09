@@ -1,0 +1,7 @@
+@import "~/.config/rofi/colors-wal.rasi"
+
+* {
+  background-color: @color1;
+  text-color: @foreground;
+}
+

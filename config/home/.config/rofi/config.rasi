@@ -1,0 +1,14 @@
+@import "~/.config/rofi/colors-wal.rasi"
+
+* {
+  background-color: @color1;
+  /*text-color: @foreground;*/
+}
+
+configuration {
+    modi: "drun,window";
+    show-icons: true;
+    icon-theme: "Papirus";
+    font: "JetBrainsMono Nerd Font 14";
+    terminal: "kitty";
+}

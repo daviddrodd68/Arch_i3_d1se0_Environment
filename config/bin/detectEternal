@@ -1,0 +1,26 @@
+#!/bin/env python3
+
+import subprocess
+import re
+from rich.console import Console
+from rich.panel import Panel
+
+def check_smbv1_vulnerability(ip):
+    console = Console()
+    console.print(Panel(f"Escaneando [bold yellow]{ip}[/bold yellow] en busca de vulnerabilidad SMBv1 (EternalBlue)...", title="[bold red]SMB Vulnerability Scan[/bold red]", expand=False))
+
+    try:
+        result = subprocess.run(["nmap", "-p", "445", "--script", "smb-vuln-ms17-010", ip], capture_output=True, text=True)
+
+        if "VULNERABLE" in result.stdout:
+            console.print(Panel("[bold red]¡El sistema es vulnerable a EternalBlue![/bold red] ⚠️", title="[bold red]Vulnerabilidad Detectada[/bold red]", expand=False))
+        else:
+            console.print(Panel("[bold green]El sistema NO es vulnerable a EternalBlue.[/bold green] ✅", title="[bold green]Seguro[/bold green]", expand=False))
+
+    except Exception as e:
+        console.print(f"[bold red]Error al ejecutar el escaneo:[/bold red] {e}")
+
+if __name__ == "__main__":
+    console = Console()
+    ip = console.input("[bold yellow]Introduce la IP a escanear: [/bold yellow]")
+    check_smbv1_vulnerability(ip)

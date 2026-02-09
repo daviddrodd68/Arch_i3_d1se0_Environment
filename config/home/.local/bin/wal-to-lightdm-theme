@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+WAL="$HOME/.cache/wal/colors.json"
+GTK="/usr/share/themes/LightDM-Wal/gtk-3.0/gtk.css"
+
+# Seguridad
+command -v jq >/dev/null || exit 1
+[ -f "$WAL" ] || exit 1
+[ -w "$GTK" ] || exit 0   # si no hay permisos, no rompe login
+
+# ─────────────────────────────
+# Extraer colores wal
+# ─────────────────────────────
+bg=$(jq -r '.special.background' "$WAL")
+fg=$(jq -r '.special.foreground' "$WAL")
+fg_muted=$(jq -r '.colors.color8' "$WAL")
+accent=$(jq -r '.colors.color4' "$WAL")
+accent_hover=$(jq -r '.colors.color1' "$WAL")
+
+# Panel semi-transparente (bg con alpha)
+bg_panel="rgba(10,17,22,0.88)"
+border_color="rgba(255,255,255,0.08)"
+
+# ─────────────────────────────
+# Función replace segura
+# ─────────────────────────────
+replace() {
+    sudo sed -i "s|^@define-color $1 .*|@define-color $1 $2;|" "$GTK"
+}
+
+# ─────────────────────────────
+# Aplicar colores
+# ─────────────────────────────
+replace bg_color "$bg"
+replace fg_color "$fg"
+replace fg_muted "$fg_muted"
+replace accent "$accent"
+replace accent_hover "$accent_hover"
+replace bg_panel "$bg_panel"
+replace border_color "$border_color"

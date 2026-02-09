@@ -1,0 +1,10 @@
+backend = "xrender";
+vsync = false;
+use-damage = false;
+
+corner-radius = 20;
+
+rounded-corners-exclude = [
+  "window_type = 'dock'",
+  "window_type = 'desktop'"
+];

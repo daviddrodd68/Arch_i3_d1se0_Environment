@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=File Manager
+GenericName=File Manager
+Comment=Browse the filesystem
+Exec=thunar
+Icon=system-file-manager
+Terminal=false
+Categories=System;FileManager;
+MimeType=inode/directory;
+

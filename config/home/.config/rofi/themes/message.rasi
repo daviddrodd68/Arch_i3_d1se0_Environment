@@ -1,0 +1,12 @@
+@import "colors.rasi"
+
+window {
+    location: center;
+    width: 300px;
+    border-radius: 14px;
+    background-color: @bg;
+}
+
+mainbox {
+    padding: 20px;
+}

@@ -1,0 +1,22 @@
+/* variables from pywal */
+* {
+    background:     #0a1116;
+    foreground:     #e4dcd2;
+
+    color0:         #0a1116;
+    color1:         #906F65;
+    color2:         #7B8479;
+    color3:         #8C877A;
+    color4:         #D38B77;
+    color5:         #7C8A82;
+    color6:         #A39F90;
+    color7:         #e4dcd2;
+    color8:         #9f9a93;
+    color9:         #906F65;
+    color10:        #7B8479;
+    color11:        #8C877A;
+    color12:        #D38B77;
+    color13:        #7C8A82;
+    color14:        #A39F90;
+    color15:        #e4dcd2;
+}

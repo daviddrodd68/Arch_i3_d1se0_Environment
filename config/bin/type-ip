@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -e
+
+export DISPLAY=:0
+export XAUTHORITY="$HOME/.Xauthority"
+
+sleep 0.2
+
+get_ip() {
+  ip addr show "$1" 2>/dev/null | awk '/inet /{print $2}' | cut -d/ -f1
+}
+
+case "$1" in
+  self)
+    IP=$(get_ip tun0)
+    if [ -z "$IP" ]; then
+      IP=$(get_ip ens32 || get_ip eth0 || get_ip enp0s3)
+    fi
+    [ -z "$IP" ] && IP="NO IP"
+    ;;
+  target)
+    if [ -f "$HOME/.cache/target" ] && [ -s "$HOME/.cache/target" ]; then
+      IP=$(cat "$HOME/.cache/target")
+    else
+      IP="No Target"
+    fi
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+
+# Esperar a que haya foco real
+WIN=$(xdotool getwindowfocus 2>/dev/null || true)
+[ -z "$WIN" ] && exit 0
+
+xdotool windowfocus --sync "$WIN"
+xdotool type --delay 1 --clearmodifiers "$IP"

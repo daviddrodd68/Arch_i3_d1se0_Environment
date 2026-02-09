@@ -1,0 +1,32 @@
+@import "~/.config/rofi/colors-wal.rasi"
+
+* {
+  background-color: @color1;
+  /*text-color: @foreground;*/
+}
+
+window {
+  location: center;
+  width: 460px;
+  height: 80px;
+  border-radius: 14px;
+}
+
+mainbox {
+  padding: 20px;
+}
+
+inputbar {
+  padding: 0px 10px;
+  spacing: 14px;
+}
+
+element {
+  padding: 4px;
+  border-radius: 12px;
+}
+
+element selected {
+  background-color: #906F65;
+  text-color: @color4;
+}

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+USER_HOME="/home/diseo"
+XPROFILE="$USER_HOME/.config/x11/xprofile"
+GREETER="/etc/lightdm/lightdm-gtk-greeter.conf"
+BG_DIR="/usr/share/backgrounds"
+
+# Extraer wallpaper usado por wal
+WALL=$(grep -oP 'wal -i "\K[^"]+' "$XPROFILE" | tail -n1)
+
+if [[ -z "$WALL" || ! -f "$WALL" ]]; then
+    exit 0
+fi
+
+NAME=$(basename "$WALL")
+
+# Copiar si no existe
+if [[ ! -f "$BG_DIR/$NAME" ]]; then
+    cp "$WALL" "$BG_DIR/$NAME"
+    chmod 644 "$BG_DIR/$NAME"
+fi
+
+# Actualizar greeter
+sed -i "s|^background=.*|background=$BG_DIR/$NAME|" "$GREETER"

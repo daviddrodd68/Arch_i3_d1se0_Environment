@@ -1,0 +1,61 @@
+#!/bin/env python3
+
+import subprocess
+import re
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.table import Table
+from rich.text import Text
+
+console = Console()
+
+def run_command(command):
+    """Ejecuta un comando en la terminal y devuelve su salida como string."""
+    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return result.stdout.decode()
+
+def get_open_ports(nmap_output):
+    """Extrae los puertos abiertos del output de Nmap."""
+    ports = re.findall(r'^(\d{1,5})/tcp\s+open', nmap_output, re.MULTILINE)
+    return ports
+
+def display_ports(ports):
+    """Muestra los puertos abiertos en una tabla bonita."""
+    table = Table(title="Puertos Abiertos Encontrados", style="bold green")
+    table.add_column("Puerto", style="cyan", justify="center")
+
+    for port in ports:
+        table.add_row(port)
+
+    console.print(table)
+
+def main():
+    console.print(Panel.fit("🔍 [bold yellow]Escaneo Nmap Automático[/bold yellow]", style="bold blue"))
+
+    ip = Prompt.ask("[bold white]Introduce la IP que quieres escanear[/bold white]").strip()
+
+    console.print(f"\n[bold green][+] Ejecutando primer escaneo contra {ip}...[/bold green]")
+    scan1_cmd = f"nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn {ip}"
+    scan1_output = run_command(scan1_cmd)
+
+    # Extraer y mostrar puertos
+    open_ports = get_open_ports(scan1_output)
+    if not open_ports:
+        console.print("[bold red][-] No se encontraron puertos abiertos.[/bold red]")
+        return
+
+    console.print("\n[bold blue][+] Puertos abiertos encontrados:[/bold blue]")
+    display_ports(open_ports)
+
+    ports_str = ','.join(open_ports)
+
+    console.print(f"\n[bold green][+] Ejecutando escaneo de servicios con -sCV en puertos: [bold cyan]{ports_str}[/bold cyan][/bold green]")
+    scan2_cmd = f"nmap -sCV -p{ports_str} {ip}"
+    scan2_output = run_command(scan2_cmd)
+
+    console.print(Panel.fit("[bold magenta]Resultado completo del escaneo con -sCV[/bold magenta]", style="magenta"))
+    console.print(scan2_output, highlight=True)
+
+if __name__ == "__main__":
+    main()

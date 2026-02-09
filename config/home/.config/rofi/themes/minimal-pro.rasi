@@ -1,0 +1,78 @@
+/* ===============================
+   Rofi Minimal Pro
+   =============================== */
+
+* {
+    bg:        #1b1f24;
+    bg-alt:    #232831;
+    fg:        #d0d4da;
+    fg-muted:  #8b9199;
+    /*accent:    #e6e8eb;*/
+    accent:    #878787;
+
+    font: "JetBrainsMono Nerd Font 12";
+
+    background-color: transparent;
+    text-color: @fg;
+}
+
+/* ───── Window ───── */
+window {
+    location: center;
+    width: 520px;
+    border-radius: 18px;
+    background-color: @bg;
+    padding: 20px;
+}
+
+/* ───── Input ───── */
+inputbar {
+    padding: 12px 14px;
+    spacing: 14px;
+    border-radius: 12px;
+    background-color: @bg-alt;
+    text-color: @fg;
+    margin: 0px 0px 14px 0px;
+}
+
+prompt {
+    enabled: true;
+    text-color: @fg-muted;
+}
+
+entry {
+    placeholder: "Type to search…";
+    placeholder-color: @fg-muted;
+}
+
+/* ───── List ───── */
+listview {
+    lines: 10;
+    spacing: 6px;
+    background-color: transparent;
+}
+
+/* ───── Item ───── */
+element {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+/* Hover */
+element selected {
+    background-color: @accent;
+    text-color: @bg;
+}
+
+/* Icon */
+element-icon {
+    size: 20px;
+    margin: 0px 10px 0px 0px;
+}
+
+/* Text */
+element-text {
+    vertical-align: 0.5;
+    text-color: @fg;
+}

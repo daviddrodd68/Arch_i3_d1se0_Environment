@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+POSH_THEME="$HOME/.config/ohmyposh/EDM115-newline.omp.json"
+WAL_COLORS="$HOME/.cache/wal/colors.json"
+
+[[ -f "$POSH_THEME" ]] || { echo "❌ No existe: $POSH_THEME"; exit 1; }
+[[ -f "$WAL_COLORS" ]] || { echo "❌ No existe: $WAL_COLORS"; exit 1; }
+
+tmp="$(mktemp)"
+
+# Extraer solo la paleta de wal
+wal_palette="$(jq '.colors' "$WAL_COLORS")"
+
+# Eliminar palette vieja y añadir la nueva
+jq --argjson palette "$wal_palette" '
+  del(.palette)
+  | .palette = $palette
+' "$POSH_THEME" > "$tmp"
+
+# Seguridad
+if ! jq empty "$tmp" >/dev/null 2>&1; then
+  echo "❌ JSON inválido generado, abortando"
+  rm -f "$tmp"
+  exit 1
+fi
+
+mv "$tmp" "$POSH_THEME"
+echo "✅ Oh My Posh actualizado con colores de wal"

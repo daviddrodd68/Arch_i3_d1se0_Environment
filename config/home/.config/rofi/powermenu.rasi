@@ -1,0 +1,79 @@
+@import "~/.config/rofi/colors-wal.rasi"
+
+* {
+    background-color: @color1;
+    /*text-color: @foreground;*/
+}
+
+configuration {
+    show-icons: true;
+    icon-theme: "Papirus";
+    font: "JetBrainsMono Nerd Font 12";
+    disable-history: true;
+}
+
+window {
+    location: center;
+    width: 340px;
+    height: 240px;
+    border-radius: 22px;
+    background-color: @color1;
+}
+
+mainbox {
+    padding: 14px;
+    spacing: 14px;
+    background-color: transparent;
+}
+
+/* Prompt (Uptime) */
+prompt {
+    enabled: true;
+    padding: 4px 6px;
+    margin: 0px 0px 4px 0px;
+    background-color: @color1;
+    text-color: @color15;
+    border-radius: 14px;
+}
+
+/* Sin input */
+entry {
+    enabled: false;
+}
+
+listview {
+    lines: 4;
+    spacing: 2px;
+    background-color: transparent;
+}
+
+/* Botones */
+element {
+    /*background-color: @color6;*/
+    /*text-color: @foreground;*/
+    padding: 4px;
+    border-radius: 18px;
+    orientation: horizontal;
+}
+
+/* Icono */
+element-icon {
+    background-color: transparent;
+    /*text-color: inherit;*/
+    size: 28px;
+    margin: 0px 14px 0px 0px;
+}
+
+/* Texto */
+element-text {
+    background-color: transparent;
+    /*text-color: inherit;*/
+    vertical-align: 0.5;
+    text-color: @color15;
+}
+
+/* Seleccionado */
+element selected {
+    background-color: @color3;
+    text-color: @background;  
+}

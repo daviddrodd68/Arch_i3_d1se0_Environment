@@ -1,0 +1,4 @@
+# create enum directories
+function mkt(){
+    mkdir {nmap,content,exploits,scripts}
+}

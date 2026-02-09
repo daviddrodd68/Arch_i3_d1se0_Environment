@@ -1,0 +1,16 @@
+@import "~/.config/rofi/colors-wal.rasi"
+
+* {
+  background-color: @color1;
+  text-color: @foreground;
+}
+
+window {
+  location: center;
+  width: 320px;
+  border-radius: 14px;
+}
+
+mainbox {
+  padding: 20px;
+}

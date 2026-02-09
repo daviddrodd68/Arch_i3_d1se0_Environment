@@ -1,0 +1,3 @@
+# Para abrir NvimTree dentro de nvim
+# Pulsaremos SPACE + t (Para abrirlo)
+# Pulsaremos de nuevo SPACE + t (Para cerrarlo)

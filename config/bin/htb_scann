@@ -1,0 +1,174 @@
+#!/bin/bash
+
+DIR_WORDLIST="/usr/share/wordlists/seclists/Discovery/Web-Content/big.txt"
+SUB_WORDLIST="/usr/share/wordlists/seclists/Discovery/DNS/bitquark-subdomains-top100000.txt"
+THREADS=100
+
+ERRO="[\e[31m-\e[0m]"
+WARN="[\e[33m!\e[0m]"
+STAT="[\e[34m*\e[0m]"
+INFO="[\e[32m+\e[0m]"
+
+parse_args() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: $0 <IP> [-m <machine_name>] [-u <username>] [-p <password>]"
+        exit 1
+    fi
+    IP="$1"
+    shift
+
+    while getopts ":m:u:p:" opt; do
+        case $opt in
+            m)  MACHINE="$OPTARG" ;;
+            u)  USERNAME="$OPTARG" ;;
+            p)  PASSWORD="$OPTARG" ;;
+            \?) echo -e "$WARN Invalid option: -$OPTARG"
+                echo "Usage: $0 <IP> [-m <machine_name>] [-u <username>] [-p <password>]"
+                exit 1 ;;
+            :)  echo -e "$WARN Option -$OPTARG requires an argument"
+                echo "Usage: $0 <IP> [-m <machine_name>] [-u <username>] [-p <password>]"
+                exit 1 ;;
+        esac
+    done
+}
+
+test_connection() {
+    if [[ ! $IP =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        echo -e "$ERRO Error: Invalid IP"
+        exit 1
+    fi
+    ping -c 1 -W 2 $IP >/dev/null 2>&1 || { echo -e "$ERRO Error: Can't connect to $IP"; exit 1; }
+}
+
+fast_nmap_scan() {
+    mkdir -p nmap
+    NMAP="nmap/nmap_$IP"
+
+    nmap -sSCV --top-ports 1000 --open -T5 --min-rate 10000 -n -Pn -oA $NMAP -v $IP 2>/dev/null | grep -oiP 'discovered open port \d+|initiating.*scan'
+    grep -v '^#' $NMAP.nmap | head -n -3
+}
+
+full_nmap_scan() {
+    echo -e "\n$STAT Running full nmap scan on background"
+    { 
+        nmap -sSUCV -p T:1-65535,U:53,67,68,123,137,161,500 --open -T5 --min-rate 10000 -n -Pn -oX $NMAP $IP >/dev/null 2>&1
+        xsltproc $NMAP.xml -o $NMAP.html
+    } & pid1=$!
+}
+
+netexec_enum() {
+    echo -e "\n$STAT NetExec (SMB, LDAP, WINRM, SSH, WMI, RDP, MSSQL, FTP, NFS, VNC)"
+
+    if [ -n "$USERNAME" ] && [ -n "$PASSWORD" ]; then
+        AUTH_ARGS="-u $USERNAME -p $PASSWORD"
+    fi
+
+    for service in smb ldap winrm ssh wmi rdp mssql ftp nfs vnc; do
+        unbuffer netexec $service $IP $AUTH_ARGS | tee netexec.out
+        if [ -f "netexec.out" ] && [ -s "netexec.out" ]; then
+            SERVICE=$service
+            if ! grep -q "\[+\]" netexec.out; then
+                AUTH_ARGS=""
+            fi
+            break
+        fi
+    done
+
+    if [ ! -f "netexec.out" ] || [ ! -s "netexec.out" ]; then
+        echo -e "$WARN No response from any of this services"
+    else
+        for auth in "$AUTH_ARGS" "-u '' -p ''" "-u guest -p guest" "-u guest -p ''"; do
+            if [ -z "$USERS" ] && [ -z "$SHARES" ]; then
+                USERS=$(unbuffer netexec $SERVICE $IP $auth --users | sed '1,2d' | head -n -1 | awk '{print substr($0, index($0, $5))}')
+                echo "$USERS"
+                SHARES=$(unbuffer netexec $SERVICE $IP $auth --shares | sed '1,2d' | awk '{print substr($0, index($0, $5))}')
+                echo "$SHARES"
+            else
+                break
+            fi
+        done
+    fi
+}
+
+domain_discovery() {
+    echo -e "\n$STAT Getting domain name"
+
+    DOMAINS=()
+    DOMAINS+=( $(grep -oiP '\b[a-zA-Z0-9.-]+\.htb' "$NMAP.nmap" 2>/dev/null) )
+    DOMAINS+=( $(grep -oiP '\b[a-zA-Z0-9.-]+\.htb' netexec.out 2>/dev/null) )
+    DOMAINS+=( $( (curl -fsvL --connect-timeout 3 http://$IP || curl -fsvL --connect-timeout 3 https://$IP) |& grep -oiP '\b[a-zA-Z0-9.-]+\.htb') ) & pid2=$!
+    DOMAINS+=( $( (timeout 3 dig -x $IP @$IP || timeout 3 dig -x +tcp $IP @$IP || timeout 3 nslookup $IP $IP) |& grep -oiP '\b[a-zA-Z0-9.-]+\.htb') ) & pid3=$!
+    wait $pid2 $pid3
+    DOMAINS=( $(echo "${DOMAINS[@]}" | tr '[:upper:]' '[:lower:]' | tr ' ' '\n' | sort -u) )
+
+    if [[ "${#DOMAINS[@]}" -lt 1 ]]; then
+        echo -e "$ERRO No domains found"
+        echo -e "$WARN Will use $IP as target host"
+        TARGET="$IP"
+    else
+        echo -e "$INFO Domain found: ${DOMAINS[@]}"
+        TARGET=$(printf "%s\n" "${DOMAINS[@]}" | awk -F. '{print $(NF-1)"."$NF}' | sort -u | head -n 1)
+        HOSTS=( "$IP" "${DOMAINS[@]}")
+        sudo sed -i "/$IP/d" /etc/hosts
+        for domain in "${DOMAINS[@]}"; do sudo sed -i "/$domain/Id" /etc/hosts; done
+        echo "${HOSTS[@]}" | sudo tee -a /etc/hosts >/dev/null
+        echo -e "$INFO Added ${HOSTS[@]:1} to /etc/hosts"
+    fi
+}
+
+web_scan() {
+    HTTP_PORTS=$(grep 'open.*http' $NMAP.nmap | grep -viE 'httpapi|rpc')
+    echo -e "\n$INFO HTTP ports found: $(echo "$HTTP_PORTS" | cut -d'/' -f1 | tr '\n' ' ')"
+    if [ -n "$HTTP_PORTS" ]; then
+        mkdir -p web
+        echo "$HTTP_PORTS" | while read -r http_port; do
+            PROTOCOL="http" && echo "$http_port" | grep -qE 'ssl|tls|https' && PROTOCOL="https"
+            PORT=$(echo "$http_port" | cut -d'/' -f1)
+            URL="$PROTOCOL://$TARGET:$PORT"
+
+            # TODO: Hacer por cada $URL un ffuf y un whatweb
+
+            echo -e "\n$STAT Scanning $URL"
+            whatweb -a3 "$URL" --log-verbose web/whatweb_$PORT.out --colour always
+
+            echo -e "$STAT Fuzzing subdomains  [Press (Ctrl-C) to stop]"
+            ffuf -c -noninteractive -t $THREADS -u "$URL" -H "Host: FUZZ.$TARGET:$PORT" -w $SUB_WORDLIST -ac 2>/dev/null | tee web/subdomains_$PORT.out
+            SUBDOMAINS=( $(sed -r 's/\x1B\[[0-9;]*[mK]//g' web/subdomains_$PORT.out | tr -d '\r' | awk '{ print $1 }' 2>/dev/null) )
+            if [[ ! "${#SUBDOMAINS[@]}" -lt 1 ]]; then
+                for subdomain in "${SUBDOMAINS[@]}"; do
+                    sudo sed -i "/^$IP / s/$/ $subdomain.$TARGET/" /etc/hosts >/dev/null
+                    echo -e "$INFO Added $subdomain.$TARGET to /etc/hosts"
+                done
+            fi
+
+            echo -e "$STAT Fuzzing directories  [Press (Ctrl-C) to stop]"
+            ffuf -c -noninteractive -t $THREADS -u "$URL/FUZZ" -w $DIR_WORDLIST -ac -e '.html,.php,.aspx,.txt,.xml' 2>/dev/null | tee web/dir-enum_$PORT.out
+        done
+    else
+        echo -e "\n$ERRO No web ports found"
+    fi
+}
+
+generate_report() {
+    echo -e "\n$INFO Saved HTML Nmap report '$(pwd)/$NMAP.html'"
+}
+
+main() {
+    parse_args "$@"
+    sudo -v
+
+    echo -e "\n$STAT Starting scan against $IP $MACHINE"
+    
+    test_connection
+    fast_nmap_scan
+    full_nmap_scan
+    netexec_enum
+    domain_discovery
+    web_scan
+    wait $pid1
+    
+    echo -e "\n$INFO All scans completed!"
+    generate_report
+}
+
+main "$@"

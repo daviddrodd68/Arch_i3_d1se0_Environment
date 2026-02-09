@@ -1,0 +1,22 @@
+@import "colors.rasi"
+
+window {
+    location: center;
+    width: 260px;
+    border-radius: 16px;
+    background-color: @bg;
+}
+
+mainbox {
+    padding: 20px;
+}
+
+element {
+    padding: 14px;
+    border-radius: 12px;
+}
+
+element selected {
+    background-color: @danger;
+    text-color: #111111;
+}

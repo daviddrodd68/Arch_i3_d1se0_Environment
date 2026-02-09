@@ -1,0 +1,13 @@
+#!/bin/bash
+
+TARGET="$HOME/.cache/target"
+
+# Si no se pasa argumento → No Target
+if [ -z "$1" ]; then
+    echo "No Target" > "$TARGET"
+    exit 0
+fi
+
+# Si hay argumento
+echo "$1" > "$TARGET"
+

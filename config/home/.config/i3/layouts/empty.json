@@ -1,0 +1,8 @@
+{
+  "border": "none",
+  "floating": "auto_off",
+  "layout": "splith",
+  "percent": 1.0,
+  "type": "con",
+  "nodes": []
+}

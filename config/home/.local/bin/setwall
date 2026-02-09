@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+WALL_DIR="$HOME/.wallpapers"
+XPROFILE="$HOME/.config/x11/xprofile"
+MARKER="# Wallpaper + colors (UNICA fuente de verdad)"
+
+command -v wal >/dev/null || { echo "❌ wal no está instalado"; exit 1; }
+[ -d "$WALL_DIR" ] || { echo "❌ No existe $WALL_DIR"; exit 1; }
+[ -f "$XPROFILE" ] || { echo "❌ No existe $XPROFILE"; exit 1; }
+
+clear
+echo "🖼️  Fondos disponibles en $WALL_DIR"
+echo "----------------------------------"
+
+mapfile -t WALLS < <(ls -1 "$WALL_DIR")
+
+if [ "${#WALLS[@]}" -eq 0 ]; then
+    echo "❌ No hay fondos en $WALL_DIR"
+    exit 1
+fi
+
+for i in "${!WALLS[@]}"; do
+    printf " [%d] %s\n" "$i" "${WALLS[$i]}"
+done
+
+echo
+read -rp "👉 Elige un fondo (número): " choice
+
+if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -ge "${#WALLS[@]}" ]; then
+    echo "❌ Selección inválida"
+    exit 1
+fi
+
+WALL="$WALL_DIR/${WALLS[$choice]}"
+
+echo
+echo "🎨 Aplicando wal con: $WALL"
+wal -i "$WALL" || exit 1
+
+# 1️⃣ Eliminar cualquier wal previo
+sed -i '/^[[:space:]]*wal -i/d' "$XPROFILE"
+
+# 2️⃣ Insertar wal justo debajo del marcador
+if grep -qF "$MARKER" "$XPROFILE"; then
+    sed -i "/$MARKER/a wal -i \"$WALL\"" "$XPROFILE"
+else
+    echo "❌ No se encontró el marcador en xprofile"
+    exit 1
+fi
+
+echo
+echo "✅ Fondo y colores actualizados"
+echo "♻️ ENecesario reiniciar 'sudo reboot'"

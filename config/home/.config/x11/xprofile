@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# DPI (VMware safe)
+xrandr --dpi 96
+
+# Wallpaper + colors (UNICA fuente de verdad)
+wal -i "$HOME/.wallpapers/flowers.png"
+~/.local/bin/wal-to-posh
+~/.local/bin/wal-to-rofi-vars
+$HOME/.local/bin/wal-to-lightdm-theme
+
+# Notifications
+pidof dunst >/dev/null || dunst &
+
+# Audio
+pidof pipewire >/dev/null || pipewire &
+
+# Hide mouse when typing
+pidof unclutter >/dev/null || unclutter &
+
+# Cursor fix
+xsetroot -cursor_name left_ptr
+
+# Aplicar conf de Kitty
+# xcompmgr -c -t-5 -l-5 -r5 -o.2 &
+picom --config ~/.config/picom/picom.conf &

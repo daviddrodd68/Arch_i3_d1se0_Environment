@@ -1,0 +1,13 @@
+#!/bin/bash
+
+s () {
+        if [ $# -lt 2 ]
+        then
+                echo '[!] Usage: s [options] <user>@<host> <password>'
+                return 1
+        fi
+        args=("$@")
+        password="${args[-1]}"
+        unset 'args[-1]'
+        sshpass -p "$password" ssh -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null "${args[@]}"
+}

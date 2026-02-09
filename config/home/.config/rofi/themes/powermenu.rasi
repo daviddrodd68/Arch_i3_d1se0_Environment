@@ -1,0 +1,47 @@
+@import "colors.rasi"
+
+configuration {
+    show-icons: true;
+    icon-theme: "Papirus";
+    font: "JetBrainsMono Nerd Font 16";
+}
+
+window {
+    location: center;
+    width: 360px;
+    border-radius: 20px;
+    background-color: @bg;
+}
+
+mainbox {
+    padding: 25px;
+    spacing: 12px;
+}
+
+prompt {
+    enabled: true;
+    padding: 8px;
+    text-color: @accent;
+    font: "JetBrainsMono Nerd Font 12";
+}
+
+listview {
+    lines: 4;
+    spacing: 12px;
+}
+
+element {
+    padding: 18px;
+    border-radius: 16px;
+    background-color: @bg2;
+    text-color: @fg;
+}
+
+element-icon {
+    size: 32px;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: #111111;
+}

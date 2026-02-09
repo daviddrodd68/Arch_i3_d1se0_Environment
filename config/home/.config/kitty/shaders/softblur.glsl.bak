@@ -1,0 +1,10 @@
+vec4 main(vec2 pos) {
+    vec4 c = texture2D(texture, pos);
+    vec4 blur = vec4(0.0);
+    blur += texture2D(texture, pos + vec2(0.001, 0.0));
+    blur += texture2D(texture, pos + vec2(-0.001, 0.0));
+    blur += texture2D(texture, pos + vec2(0.0, 0.001));
+    blur += texture2D(texture, pos + vec2(0.0, -0.001));
+    blur /= 4.0;
+    return mix(c, blur, 0.35);
+}
