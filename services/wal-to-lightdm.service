@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync wal wallpaper with LightDM
+After=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wal-to-lightdm
+User=root
+
+[Install]
+WantedBy=graphical.target
