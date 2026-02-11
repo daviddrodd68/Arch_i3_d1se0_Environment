@@ -146,6 +146,7 @@ Durante la instalación con archinstall:
 ```bash
 git clone https://github.com/D1se0/Arch_i3_d1se0_Environment.git
 cd Arch_i3_d1se0_Environment/
+chmod +x scripts/*
 chmod +x install.sh
 ```
 
